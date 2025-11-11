@@ -1,0 +1,17 @@
+-- CreateTable
+CREATE TABLE "Dier" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "naam" TEXT NOT NULL,
+    "soort" TEXT NOT NULL,
+    "leeftijd" INTEGER NOT NULL,
+    "beschrijving" TEXT,
+    "aangemaakt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- CreateTable
+CREATE TABLE "Faq" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "vraag" TEXT NOT NULL,
+    "antwoord" TEXT NOT NULL,
+    "aangemaakt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
