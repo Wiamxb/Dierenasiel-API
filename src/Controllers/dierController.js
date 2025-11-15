@@ -14,32 +14,51 @@ export const getDierById = async (req, res) => {
     res.json(dier);
 };
 
+// 🔵 VALIDATIE TOEGEVOEGD
 export const maakDier = async (req, res) => {
     const { naam, soort, leeftijd, beschrijving } = req.body;
 
+    // Validatie
+    if (!naam || !soort || !leeftijd) {
+        return res.status(400).json({ error: "Naam, soort en leeftijd zijn verplicht" });
+    }
+
+    if (isNaN(leeftijd)) {
+        return res.status(400).json({ error: "Leeftijd moet een nummer zijn" });
+    }
+
     const nieuwDier = await prisma.dier.create({
-        data: { naam, soort, leeftijd, beschrijving },
+        data: { naam, soort, leeftijd: Number(leeftijd), beschrijving },
     });
 
     res.status(201).json(nieuwDier);
 };
 
+// 🔵 FOUTAFHANDELING TOEGEVOEGD
 export const updateDier = async (req, res) => {
     const id = parseInt(req.params.id);
     const { naam, soort, leeftijd, beschrijving } = req.body;
 
-    const dier = await prisma.dier.update({
-        where: { id },
-        data: { naam, soort, leeftijd, beschrijving },
-    });
+    try {
+        const dier = await prisma.dier.update({
+            where: { id },
+            data: { naam, soort, leeftijd, beschrijving },
+        });
 
-    res.json(dier);
+        res.json(dier);
+    } catch {
+        res.status(404).json({ error: "Dier niet gevonden" });
+    }
 };
 
+// 🔵 FOUTAFHANDELING TOEGEVOEGD
 export const verwijderDier = async (req, res) => {
     const id = parseInt(req.params.id);
 
-    await prisma.dier.delete({ where: { id } });
-
-    res.json({ message: "Dier verwijderd" });
+    try {
+        await prisma.dier.delete({ where: { id } });
+        res.json({ message: "Dier verwijderd" });
+    } catch {
+        res.status(404).json({ error: "Dier niet gevonden" });
+    }
 };

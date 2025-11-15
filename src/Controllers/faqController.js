@@ -8,14 +8,23 @@ export const getAlleFaq = async (req, res) => {
 
 export const getFaqById = async (req, res) => {
     const id = parseInt(req.params.id);
+
     const item = await prisma.faq.findUnique({ where: { id } });
 
-    if (!item) return res.status(404).json({ message: "FAQ niet gevonden" });
+    if (!item) {
+        return res.status(404).json({ message: "FAQ niet gevonden" });
+    }
+
     res.json(item);
 };
 
 export const maakFaq = async (req, res) => {
     const { vraag, antwoord } = req.body;
+
+    // Validatie
+    if (!vraag || !antwoord) {
+        return res.status(400).json({ error: "Vraag en antwoord zijn verplicht" });
+    }
 
     const nieuwItem = await prisma.faq.create({
         data: { vraag, antwoord },
@@ -28,18 +37,25 @@ export const updateFaq = async (req, res) => {
     const id = parseInt(req.params.id);
     const { vraag, antwoord } = req.body;
 
-    const item = await prisma.faq.update({
-        where: { id },
-        data: { vraag, antwoord },
-    });
+    try {
+        const item = await prisma.faq.update({
+            where: { id },
+            data: { vraag, antwoord },
+        });
 
-    res.json(item);
+        res.json(item);
+    } catch {
+        res.status(404).json({ error: "FAQ niet gevonden" });
+    }
 };
 
 export const verwijderFaq = async (req, res) => {
     const id = parseInt(req.params.id);
 
-    await prisma.faq.delete({ where: { id } });
-
-    res.json({ message: "FAQ verwijderd" });
+    try {
+        await prisma.faq.delete({ where: { id } });
+        res.json({ message: "FAQ verwijderd" });
+    } catch {
+        res.status(404).json({ error: "FAQ niet gevonden" });
+    }
 };
