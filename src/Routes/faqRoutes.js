@@ -4,12 +4,15 @@ import {
     getFaqById,
     maakFaq,
     updateFaq,
-    verwijderFaq
+    verwijderFaq,
+    zoekFaq
 } from "../controllers/faqController.js";
+
 
 const router = express.Router();
 
 router.get("/", getAlleFaq);
+router.get("/zoeken", zoekFaq);
 router.get("/:id", getFaqById);
 router.post("/", maakFaq);
 router.put("/:id", updateFaq);

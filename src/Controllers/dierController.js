@@ -1,24 +1,33 @@
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
+// GET: alle dieren met limit & offset
 export const getAlleDieren = async (req, res) => {
-    const dieren = await prisma.dier.findMany();
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = parseInt(req.query.offset) || 0;
+
+    const dieren = await prisma.dier.findMany({
+        skip: offset,
+        take: limit
+    });
+
     res.json(dieren);
 };
 
+// GET: dier op ID
 export const getDierById = async (req, res) => {
     const id = parseInt(req.params.id);
     const dier = await prisma.dier.findUnique({ where: { id } });
 
     if (!dier) return res.status(404).json({ message: "Dier niet gevonden" });
+
     res.json(dier);
 };
 
-// 🔵 VALIDATIE TOEGEVOEGD
+// POST: nieuw dier toevoegen
 export const maakDier = async (req, res) => {
     const { naam, soort, leeftijd, beschrijving } = req.body;
 
-    // Validatie
     if (!naam || !soort || !leeftijd) {
         return res.status(400).json({ error: "Naam, soort en leeftijd zijn verplicht" });
     }
@@ -34,7 +43,7 @@ export const maakDier = async (req, res) => {
     res.status(201).json(nieuwDier);
 };
 
-// 🔵 FOUTAFHANDELING TOEGEVOEGD
+// PUT: dier updaten
 export const updateDier = async (req, res) => {
     const id = parseInt(req.params.id);
     const { naam, soort, leeftijd, beschrijving } = req.body;
@@ -51,7 +60,7 @@ export const updateDier = async (req, res) => {
     }
 };
 
-// 🔵 FOUTAFHANDELING TOEGEVOEGD
+// DELETE: dier verwijderen
 export const verwijderDier = async (req, res) => {
     const id = parseInt(req.params.id);
 
@@ -61,4 +70,24 @@ export const verwijderDier = async (req, res) => {
     } catch {
         res.status(404).json({ error: "Dier niet gevonden" });
     }
+};
+
+// SEARCH: dieren zoeken op naam
+export const zoekDieren = async (req, res) => {
+    const naam = req.query.naam;
+
+    if (!naam) {
+        return res.status(400).json({ message: "Gelieve ?naam= mee te geven" });
+    }
+
+    const dieren = await prisma.dier.findMany({
+        where: {
+            naam: {
+                contains: naam
+            }
+        }
+    });
+
+
+    res.json(dieren);
 };

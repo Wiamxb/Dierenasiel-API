@@ -4,12 +4,14 @@ import {
     getDierById,
     maakDier,
     updateDier,
-    verwijderDier
+    verwijderDier,
+    zoekDieren
 } from "../controllers/dierController.js";
 
 const router = express.Router();
 
 router.get("/", getAlleDieren);
+router.get("/zoeken", zoekDieren);
 router.get("/:id", getDierById);
 router.post("/", maakDier);
 router.put("/:id", updateDier);
